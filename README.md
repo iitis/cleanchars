@@ -154,10 +154,14 @@ Opt into rewriting with `args: [--fix]` if you would rather it fixed staged file
 **Your agent, optional, paste it yourself.** cleanchars does not write to anyone's configuration; these are snippets for you to add if you want them.
 
 ```jsonc
-// ~/.claude/settings.json - clean everything touched this turn
+// ~/.claude/settings.json - clean every changed file in the repository
 { "hooks": { "Stop": [ { "hooks": [
   { "type": "command", "command": "cleanchars --changed --fix" } ] } ] } }
 ```
+
+`--changed` cannot tell the agent's edits from yours: it fixes every file git
+reports as changed, including your own uncommitted work. Findings it cannot
+fix are printed but do not stop the agent, because the hook exits 1, not 2.
 
 Codex takes the equivalent `Stop` entry in `~/.codex/hooks.json`. Codex
 requires you to review and trust hooks before they run; until you do, nothing happens and it looks broken.
