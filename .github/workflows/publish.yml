@@ -1,0 +1,82 @@
+name: publish
+
+# A v* tag publishes to PyPI, after approval on the "pypi" environment.
+# The manual button publishes to TestPyPI only, whatever ref it is run from.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # A version number can never be uploaded twice, so refuse a tag that
+      # disagrees with the version that would actually ship.
+      - name: Tag matches the package version
+        if: github.event_name == 'push'
+        run: |
+          project=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          module=$(python -c "import cleanchars; print(cleanchars.__version__)")
+          echo "tag=$GITHUB_REF_NAME pyproject=$project module=$module"
+          test "$GITHUB_REF_NAME" = "v$project"
+          test "$module" = "$project"
+
+      - name: Run the verification harness
+        run: python tests/verify.py
+
+      - name: Build and check the sdist and wheel
+        run: |
+          python -m pip install --upgrade build twine
+          python -m build
+          twine check --strict dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  testpypi:
+    needs: build
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: testpypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
+
+  # Checked on the event as well as the ref: a manual run started from a tag
+  # also has a refs/tags/ ref, and must not reach PyPI.
+  pypi:
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

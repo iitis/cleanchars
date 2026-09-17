@@ -108,7 +108,7 @@ preserve and no `--`/`---` convention, so there is nothing left to keep.
 cleanchars --fix --nb-hyphen=mbox main.tex
 ```
 
-That turns `2019&ndash;2025` into `2019--2025`, `May&ndash;August` into
+That turns 2019&ndash;2025 into `2019--2025`, May&ndash;August into
 `May--August`, an em-dash clause break into `--- clause ---`, and a
 non-breaking hyphen into `\mbox{-}`. Drop the flag for anything that is not a
 typeset document; `\mbox{-}` is not the default because it also blocks
