@@ -79,6 +79,41 @@ The right ASCII spelling depends on the file type, and is chosen from the extens
 
 Maths symbols are errors under `tex` because the source does not say whether they sit in maths mode: a multiplication sign might want `\times` or `$\times$`. You get the line and column and decide.
 
+### Hyphens and dashes
+
+Four separate characters, four separate rules:
+
+| char | what it is | plain | tex | why |
+|---|---|---|---|---|
+| U+2010 hyphen | a hyphen | `-` | `-` | ASCII `-` is this character |
+| U+2011 non-breaking hyphen | a hyphen that forbids a break | `-` | `-` | ASCII has no way to say "don't break"; `\mbox{-}` is markup, not punctuation |
+| U+2013 en dash | a range, e.g. 2019&ndash;2025 | `-` | `--` | TeX spells en dash as `--` |
+| U+2014 em dash | a clause break, e.g. text&mdash;text | `-` | `---` | TeX spells em dash as `---` |
+
+Hyphens stay hyphens. U+2010 and U+2011 both become `-`, in both profiles. The
+non-breaking property is lost, deliberately: expressing it requires
+`\mbox{-}` or `\nobreakdash-`, which is injected markup rather than a
+character, and `\mbox` additionally blocks hyphenation of the surrounding
+words. Use `--nb-hyphen=mbox` where it genuinely matters.
+
+Dashes keep their length: this is the part that must not regress. In `tex`,
+an en dash and an em dash are different characters and must stay different,
+`--` and `---`. Flattening both to `-` would turn a date range into a hyphen
+and a clause break into a hyphen too.
+
+In `plain`, all four collapse to `-`. Markdown has no line-breaking marker to
+preserve and no `--`/`---` convention, so there is nothing left to keep.
+
+```bash
+cleanchars --fix --nb-hyphen=mbox main.tex
+```
+
+That turns `2019&ndash;2025` into `2019--2025`, `May&ndash;August` into
+`May--August`, an em-dash clause break into `--- clause ---`, and a
+non-breaking hyphen into `\mbox{-}`. Drop the flag for anything that is not a
+typeset document; `\mbox{-}` is not the default because it also blocks
+hyphenation of the words around it.
+
 ## Flags worth knowing
 
 | Flag | Use it when |
