@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    name: ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # No dependencies to install: the tool and its tests are stdlib only.
+      - name: Run the verification harness
+        run: python tests/verify.py
+
+      - name: The repository's own files are clean
+        run: python cleanchars.py README.md skill/SKILL.md cleanchars.py
+
+  package:
+    name: Build and install the wheel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build the sdist and wheel
+        run: |
+          python -m pip install --upgrade build
+          python -m build
+
+      # Installed from the wheel, into its own environment, and invoked from
+      # a directory that is not the checkout: the entry point, the packaged
+      # metadata behind --version, and a real fix all have to work there.
+      - name: Install the wheel and exercise the command
+        run: |
+          python -m venv /tmp/probe
+          /tmp/probe/bin/python -m pip install --quiet dist/*.whl
+          mkdir -p /tmp/elsewhere
+          cd /tmp/elsewhere
+          /tmp/probe/bin/cleanchars --version
+          printf 'a\xe2\x80\x94b\n' > sample.md
+          /tmp/probe/bin/cleanchars sample.md && { echo "expected exit 1"; exit 1; }
+          /tmp/probe/bin/cleanchars --fix sample.md
+          /tmp/probe/bin/cleanchars sample.md
+          test "$(cat sample.md)" = "a-b"

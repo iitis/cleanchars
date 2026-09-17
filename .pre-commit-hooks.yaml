@@ -1,0 +1,6 @@
+- id: cleanchars
+  name: cleanchars
+  description: Report smart Unicode and invisible characters
+  entry: cleanchars
+  language: python
+  types: [text]

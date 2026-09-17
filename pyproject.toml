@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cleanchars"
+version = "1.0.0"
+description = "Replace smart Unicode with plain ASCII in code, Markdown and TeX"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+readme = "README.md"
+authors = [{ name = "mromaszewski", email = "mromaszewski@iitis.pl" }]
+keywords = [
+    "unicode", "ascii", "linter", "formatter",
+    "markdown", "latex", "pre-commit", "llm",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Text Processing :: Filters",
+]
+
+[project.urls]
+Homepage = "https://github.com/iitis/cleanchars"
+Source = "https://github.com/iitis/cleanchars"
+Issues = "https://github.com/iitis/cleanchars/issues"
+Changelog = "https://github.com/iitis/cleanchars/blob/main/CHANGELOG.md"
+
+[project.scripts]
+cleanchars = "cleanchars:main"
+
+# Declared explicitly: flat-layout auto-discovery gives up when more than one
+# top-level .py file is present, and it must never pick up tests/verify.py.
+[tool.setuptools]
+py-modules = ["cleanchars"]
