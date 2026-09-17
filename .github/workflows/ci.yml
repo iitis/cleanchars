@@ -5,6 +5,7 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  workflow_call:
 
 jobs:
   verify:
@@ -56,7 +57,9 @@ jobs:
           cd /tmp/elsewhere
           /tmp/probe/bin/cleanchars --version
           printf 'a\xe2\x80\x94b\n' > sample.md
-          /tmp/probe/bin/cleanchars sample.md && { echo "expected exit 1"; exit 1; }
+          status=0
+          /tmp/probe/bin/cleanchars sample.md || status=$?
+          test "$status" -eq 1
           /tmp/probe/bin/cleanchars --fix sample.md
           /tmp/probe/bin/cleanchars sample.md
           test "$(cat sample.md)" = "a-b"

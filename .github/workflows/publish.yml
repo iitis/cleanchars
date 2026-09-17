@@ -11,7 +11,11 @@ permissions:
   contents: read
 
 jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
   build:
+    needs: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,9 +36,6 @@ jobs:
           echo "tag=$GITHUB_REF_NAME pyproject=$project module=$module"
           test "$GITHUB_REF_NAME" = "v$project"
           test "$module" = "$project"
-
-      - name: Run the verification harness
-        run: python tests/verify.py
 
       - name: Build and check the sdist and wheel
         run: |

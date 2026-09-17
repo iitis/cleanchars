@@ -45,20 +45,18 @@ Driving this from an AI coding agent instead of by hand? See
 
 ## What it will not do
 
-- **Transliterate.** Accents, CJK, Greek and emoji are left alone. This is a curated cleaner, not an ASCII converter; `--strict-ascii` reports what remains instead of transliterating it, so you decide. Two characters on the replacement table are emoji as well as symbols, and the table wins: see below.
+- **Transliterate.** Accents, CJK, Greek and emoji are left alone. This is a curated cleaner, not an ASCII converter; `--strict-ascii` reports what remains instead of transliterating it, so you decide. Some characters on the replacement table are emoji as well as symbols, and the table wins: see below.
 - **Guess.** U+FFFD, U+FFFC and the invisible maths operators U+2061-U+2064 are errors, never substitutions.
 - **Touch mojibake.** A file whose apostrophes arrived as the usual
   UTF-8-read-as-CP1252 garble is reported and left intact so you can re-decode it. Rewriting it would destroy the evidence.
-- **Break emoji.** Zero-width joiners and variation selectors are kept after characters that can actually take them, stripped everywhere else.
+- **Preserve every emoji.** Joiners and variation selectors are kept where the context guard allows; mapped symbols and Unicode tags are still changed.
 - **Wander.** Directory walks and `--changed` skip `.git`, `node_modules`, `dist`, `build`, `.venv` and friends, follow an extension allowlist, and
   read regular files only: a symlink found while scanning is left alone, because it can point outside the tree you named. A file named explicitly on the command line is always processed, symlinks included.
 
 Two deliberate exceptions to "emoji are left alone", both of them the point of the tool rather than oversights:
 
-- `(C)`, `(R)` and `(TM)` replace U+00A9, U+00AE and U+2122 even when they carry an emoji variation selector, because those are exactly the characters that break monospaced and legacy renderers.
+- `(C)`, `(R)` and `(TM)` replace U+00A9, U+00AE and U+2122 even when they carry an emoji variation selector (`tex` uses `\textcopyright{}`, `\textregistered{}` and `\texttrademark{}`). Other mapped symbols, including U+203C and U+2194, are replaced too.
 - Unicode tag characters are always deleted, so the subdivision flags for Scotland, Wales and England lose their tags and come out as a plain black flag. The tag block can carry invisible payloads a reader never sees; stripping it is a deliberate part of the deletion policy, not an oversight.
-
-Every other emoji, including ZWJ sequences and variation selectors, survives.
 
 ## Profiles
 
