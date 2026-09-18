@@ -1,4 +1,8 @@
 # cleanchars
+[![PyPI](https://img.shields.io/pypi/v/cleanchars)](https://pypi.org/project/cleanchars/)
+[![CI](https://github.com/iitis/cleanchars/actions/workflows/ci.yml/badge.svg)](https://github.com/iitis/cleanchars/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/pypi/pyversions/cleanchars)](https://pypi.org/project/cleanchars/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 **Clean unwanted typographic Unicode from LaTeX, Markdown, and source files**, replacing it with deterministic, file-type-aware ASCII equivalents: curly quotes, em dashes, non-breaking spaces, and invisible formatting marks introduced by rich-text editors and LLM tools.
 
@@ -16,10 +20,16 @@ uvx cleanchars --diff notes.md
 # keep it
 uv tool install cleanchars          # or: pipx install cleanchars
 
+# into the current environment
+pip install cleanchars
+
+# no install, no package manager
+
 # no uv, no install
 curl -O https://raw.githubusercontent.com/iitis/cleanchars/v1.0.0/cleanchars.py
 python3 cleanchars.py --diff notes.md
 ```
+On PyPI: [pypi.org/project/cleanchars](https://pypi.org/project/cleanchars/)
 
 ## Use
 
