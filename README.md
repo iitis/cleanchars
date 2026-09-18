@@ -24,8 +24,6 @@ uv tool install cleanchars          # or: pipx install cleanchars
 pip install cleanchars
 
 # no install, no package manager
-
-# no uv, no install
 curl -O https://raw.githubusercontent.com/iitis/cleanchars/v1.0.0/cleanchars.py
 python3 cleanchars.py --diff notes.md
 ```
